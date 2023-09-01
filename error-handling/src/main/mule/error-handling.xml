@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="421f58d7-8ab6-4394-9b3d-a7a10ec3e328" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="672a5312-88c7-42d9-a9b8-7b4213cb040a" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="sharath" database="mydb" />
+	</db:config>
+	<flow name="error-handlingFlow" doc:id="6f2218bd-2f34-4235-90fc-66f667154e76" >
+		<http:listener doc:name="Listener" doc:id="1cb8ea27-66ad-48e2-96d0-62d4ce605667" config-ref="HTTP_Listener_config" path="error"/>
+		<logger level="INFO" doc:name="Logger" doc:id="457fa8a4-b65e-438c-97ba-0257e49dfb14" message="flow started"/>
+		<set-variable value="200" doc:name="Set Variable" doc:id="72e6579b-6706-464d-a2b3-d10b397d8311" variableName="Amount"/>
+		<choice doc:name="Choice" doc:id="0bf81aae-c801-41aa-9714-2fffb58780e9" >
+			<when expression="#[payload.order_amount &lt;= vars.amount]">
+				<ee:transform doc:name="Transform Message" doc:id="40ffc72f-5c59-44bc-a527-0e7d9d4aeab6" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "order placed successfully"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<raise-error doc:name="Raise error" doc:id="1042012d-d7f4-4b5e-b5f8-e5eb7b419560" type="in:Insufficient-funds" description="you dont have sufficient funds to process this request"/>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="bf07e505-3f95-42d4-b12a-c2f1201ec457" message="#[payload]"/>
+	</flow>
+</mule>

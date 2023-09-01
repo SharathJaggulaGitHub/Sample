@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<configuration doc:name="Configuration" doc:id="f9618541-3012-4e87-877e-828fdb274ea4" defaultErrorHandler-ref="error-apiError_Handler" />
+	<error-handler name="error-apiError_Handler" doc:id="35b66fbf-3818-4fca-9f1f-8142826a5fde" >
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="518f2369-19bb-479d-9c1d-56adf2872147" type="ANY">
+			<raise-error doc:name="Raise error" doc:id="594b0471-44c9-4008-a3ca-d7cd90fedf25" type="in:Insufficient-funds" description="process request"/>
+		</on-error-continue>
+	</error-handler>
+</mule>
